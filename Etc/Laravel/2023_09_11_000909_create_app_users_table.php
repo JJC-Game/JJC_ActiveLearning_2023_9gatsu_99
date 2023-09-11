@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('app_users', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->integer('gacha_point');
+            $table->integer('has_chara_flag')->unsigned();            
             $table->timestamps();
         });
     }
