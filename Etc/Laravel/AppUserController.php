@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\AppUser;
+use App\Models\GetItem;
 use Illuminate\Http\Request;
 
 class AppUserController extends Controller
 {
+    public $ITEM_ID_MAX = 5;
+
     public function app_user($id)
     {
         $app_user = AppUser::find($id);
@@ -28,6 +31,47 @@ class AppUserController extends Controller
 
         return view('play_chara_gacha', ['result_string' => $result_string]);
     }
+
+    public function play_item_gacha($id)
+    {
+        $result_string = "";
+
+        $rand_num = mt_rand(1, 10000);
+        $jouyo = $rand_num % $this->ITEM_ID_MAX;
+        $result_string = $result_string.$jouyo.",";
+
+        GetItem::insert([
+            'get_item_id' => $jouyo,
+            'user_id' => $id
+        ]);
+
+        return view('play_item_gacha', ['result_string' => $result_string]);
+    }
+
+    public function show_has_item($id)
+    {
+        $result_string = "";
+
+        // array_fill関数.
+        // 開始インデックス、要素数、初期値.
+        $itemNumArray = array_fill(0, $this->ITEM_ID_MAX, 0);
+        
+        $itemList = GetItem::get();
+
+        foreach ($itemList as $item) {
+            if($item->user_id != $id){
+                continue;
+            }
+
+            $itemNumArray[$item->get_item_id] ++;
+        }
+
+        for($i = 0; $i < $this->ITEM_ID_MAX; $i ++){
+            $result_string = $result_string.$itemNumArray[$i].",";
+        }
+
+        return view('show_has_item', ['result_string' => $result_string]);
+    }    
 
     public function play_chara_gacha_10($id)
     {
